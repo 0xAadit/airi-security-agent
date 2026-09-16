@@ -1,0 +1,2 @@
+# tz=America/New_York — late SIEM shard (replay correlation); same schema as edge_decisions.log
+2026-05-01T10:03:44.900-04:00 request_id= telemetry-lolt-441 decision=CONFIRM_SENSITIVE rule=soc-replay-v4

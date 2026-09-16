@@ -1,0 +1,5 @@
+# tz=America/New_York — timestamps below are ISO-8601 with explicit -04:00 (US Eastern Daylight, May 2026).
+2026-05-01T10:03:07.200-04:00 request_id=dup-export-internal decision=BREAKGLASS_ALLOW rule=staging-export
+2026-05-01T10:03:09.500-04:00 request_id=xff-amb decision=WATCHLIST_ONLY rule=export-throttle
+2026-05-01T10:03:41.000-04:00 request_id=legacy-bulk-77 decision=ALLOW_BULK_LEGACY rule=nightly-billing
+2026-05-01T10:03:42.500-04:00 request_id=soc-daily-archive-09 decision=CONFIRM_SENSITIVE rule=soc-daily-snapshot

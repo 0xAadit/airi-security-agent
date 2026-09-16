@@ -1,0 +1,15 @@
+# tz=UTC — bracketed time_subfield on each line is +0000 (GMT).
+10.0.0.5 - - [01/May/2026:14:03:04 +0000] "GET /api/v1/metrics HTTP/1.1" 200 8192 "-" "Prometheus/2.45" rid=metrics-scrape-12 xff="10.0.0.3"
+10.0.0.5 - - [01/May/2026:14:03:05 +0000] "GET /api/health HTTP/1.1" 200 12 "-" "InternalHealth/2.0" rid=lb-health-77 xff="10.0.0.2"
+10.0.0.5 - otel-collector [01/May/2026:14:03:06 +0000] "POST /api/v1/telemetry/batch HTTP/1.1" 200 2048 "-" "OpenTelemetry-Collector/0.91" rid=otel-hb-2 xff="10.0.0.7"
+10.0.0.5 - - [01/May/2026:14:03:07 +0000] "POST /api/v1/export HTTP/1.1" 200 900 "-" "python-requests/2.28" rid=dup-export-internal xff="10.0.0.12"
+10.0.0.5 - cicd_bot [01/May/2026:14:03:08 +0000] "GET /api/v1/export HTTP/1.1" 200 15000 "-" "GitLab-Runner" rid=cicd-aa xff="198.51.100.2"
+10.0.0.5 - deploysvc [01/May/2026:14:03:09 +0000] "GET /api/v1/export HTTP/1.1" 200 180000 "-" "curl/7.81.0" rid=xff-amb xff="198.51.100.1, 203.0.113.50, 10.0.0.5"
+10.0.0.5 - - [01/May/2026:14:03:10 +0000] "GET /api/health HTTP/1.1" 200 12 "-" "InternalHealth/2.0" rid=health-99 xff="10.0.0.2"
+10.0.0.5 - reporting_job [01/May/2026:14:03:41 +0000] "GET /api/v1/export?job=nightly HTTP/1.1" 200 2457600 "-" "python-requests/2.31" rid=legacy-bulk-77 xff="10.0.0.20, 198.51.100.88"
+10.0.0.5 - deploysvc [01/May/2026:14:03:42 +0000] "POST /api/v1/export HTTP/1.1" 200 512000 "-" "curl/8.5.0" rid=soc-daily-archive-09 xff="10.50.0.1, 198.51.100.50 , "
+10.0.0.5 - deploysvc [01/May/2026:14:03:44 +0000] "POST /api/v1/telemetry/batch HTTP/1.1" 200 5001 "-" "curl/8.6" rid=telemetry-lolt-441 xff="10.0.0.3, 203.0.113.50, 10.0.0.5"
+10.0.0.5 - deploysvc [01/May/2026:14:03:44 +0000] "POST /api/v1/telemetry/batch HTTP/1.1" 200 18432 "-" "python-requests/2.31" rid=telemetry-lolt-441
+	xff=" 198.51.100.1 , unknown , 203.0.113.50 , 10.0.0.5 "
+10.0.0.5 - deploysvc [01/May/2026:14:03:44 +0000] "POST /api/v1/telemetry/batch HTTP/1.1" 304 0 "-" "python-requests/2.31" rid=telemetry-lolt-441 xff="198.51.100.1, 203.0.113.50, 10.0.0.5"
+10.0.0.5 - bob [01/May/2026:14:03:55 +0000] "GET /api/v1/status HTTP/1.1" 200 44 "-" "Mozilla/5.0" rid=late-read xff="198.51.100.9"

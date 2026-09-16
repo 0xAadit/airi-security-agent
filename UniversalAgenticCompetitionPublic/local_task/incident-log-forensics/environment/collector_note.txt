@@ -1,0 +1,5 @@
+Post-incident collector note (api-3)
+
+During IR the primary application audit file `app.jsonl` was truncated mid-sync (content gap around the suspected exfil minute). A SIEM/WORM fragment was attached as `app_audit_recovered.jsonl` (same JSON schema as the primary stream).
+
+The SOC edge disposition export also arrived in two parts (`edge_decisions.log` plus a late replay shard).

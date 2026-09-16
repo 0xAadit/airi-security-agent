@@ -1,0 +1,33 @@
+schema_version = "1.2"
+
+[task]
+name = "local/incident-log-forensics"
+description = "Correlate proxy, application, and auth logs to attribute an exfiltration incident."
+authors = []
+keywords = []
+
+[metadata]
+difficulty = "medium"
+category = "security"
+tags = ["local", "forensics", "logs", "correlation"]
+
+[verifier]
+timeout_sec = 120.0
+
+[agent]
+timeout_sec = 600.0
+
+[environment]
+build_timeout_sec = 600.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 10240
+gpus = 0
+allow_internet = true
+mcp_servers = []
+
+[verifier.env]
+
+[environment.env]
+
+[solution.env]

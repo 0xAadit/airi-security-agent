@@ -1,0 +1,4 @@
+attacker_ip=203.0.113.50
+compromised_user=deploysvc
+exfil_bytes=2457600
+first_malicious_event_utc=2026-05-01T14:03:44.900Z

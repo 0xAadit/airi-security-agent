@@ -1,0 +1,38 @@
+# Secrets / credentials
+.env
+.env.*
+*.pem
+*.key
+credentials*.json
+*token*.json
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.hypothesis/
+.venv/
+venv/
+*.cover
+.coverage
+htmlcov/
+
+# Bench / runtime outputs (but keep competition task fixtures)
+*.log
+!UniversalAgenticCompetitionPublic/local_task/**/*.log
+bench-logs/
+logs/
+.pytest_cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*~
+.vscode/
+.idea/
+
+# Scratch
+work/
+tmp/

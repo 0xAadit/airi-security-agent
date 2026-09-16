@@ -1,0 +1,7 @@
+# IR-2026-0501 — passive DNS / PTR hints (best-effort, not authoritative for attribution)
+# Collected during containment; some answers are stale or load-balancer–centric.
+# Per bundle policy in notes.txt: do not use this file to override proxy-derived client IP.
+
+203.0.113.50  ptr-ambiguous.example.corp.  (last seen prior week)
+198.51.100.1  gw-edge-east.example.net.
+10.0.0.5      lb-internal-vip.api-3.svc.
