@@ -978,13 +978,14 @@ def run_llm_loop(instruction: str, kind: str, workdir: Path, deadline: float,
     a = app_dir(workdir)
     hint = {
         "trivial": "Write the exact requested file under /app and verify with cat. Prefer write_file.",
-        "audit": "Do NOT modify code. Inspect /app FastAPI code (search f-string SELECT, read routers/auth.py, routers/items.py), then write /app/security_report.json with findings (title,severity,category,location,evidence,impact,recommendation). Include SQL injection + login/auth + bypass/admin'-- detail. Validate JSON.",
+        "audit": "Do NOT modify code. Inspect /app FastAPI code (search f-string SELECT, read routers/auth.py, routers/items.py), then IMMEDIATELY write /app/security_report.json with findings (title,severity,category,location,evidence,impact,recommendation). Include SQL injection + login/auth + bypass/admin'-- detail. Validate JSON. After step 4-5 with auth.py evidence, STOP exploring and write_file, then FINAL. Do NOT re-read files already seen.",
         "fix": "Inspect /app, grep f-string SELECT, read vulnerable router, apply minimal $n parameterization fix, run pytest tests/ -q, fix failures, verify.",
         "forensics": "List /app/incident/, read all artifacts, correlate JSONL + edge CONFIRM_SENSITIVE + proxy XFF per instruction, write strict 4-line /app/incident_report.txt (no spaces, verbatim ts).",
         "generic": "Explore /app first (list_dir, search), then act toward the instruction, verify deliverables exist.",
     }.get(kind, "")
     system = ("You are a non-interactive cybersecurity agent. Complete the task autonomously. "
               f"Work dir is {a} (use absolute /app paths). {TOOLS_HELP} Keep steps short. "
+              "Reply with ONLY one tool JSON per step, no lead-in prose. Never repeat a list/read/search already done — use prior observations. "
               "Always verify (read back files, run pytest/tests, cat reports) before FINAL.")
     messages = [
         {"role": "system", "content": system},
@@ -1013,6 +1014,7 @@ def run_llm_loop(instruction: str, kind: str, workdir: Path, deadline: float,
             return f"Tool {tool} crashed (recovered): {e}"
 
     last = ""
+    seen_reads = set()  # (tool, normalized-arg) for read-only dedup; writes never deduped
     for step in range(1, max_iters + 1):
         # Sliding window for small-context local models: keep system + task + recent turns.
         if len(messages) > 10:
@@ -1041,18 +1043,38 @@ def run_llm_loop(instruction: str, kind: str, workdir: Path, deadline: float,
                 break
             continue
         messages.append({"role": "assistant", "content": resp})
+        # Dedup identical read-only calls: save a full re-read + history bloat.
+        dedup_key = None
+        if tool in ("list_dir", "read_file", "search"):
+            try:
+                dedup_key = (tool, json.dumps(args if isinstance(args, dict) else {}, sort_keys=True))
+            except Exception:
+                dedup_key = None
+        if dedup_key is not None and dedup_key in seen_reads:
+            obs = "[cached] already observed — use prior output. Prefer write_file/FINAL, do not re-list/re-read."
+            last = obs
+            messages.append({"role": "user", "content": f"OBSERVATION:\n{obs}\nContinue with next tool or FINAL: when verified."})
+            continue
+        if dedup_key is not None:
+            seen_reads.add(dedup_key)
         try:
             obs = dispatch(tool, args if isinstance(args, dict) else {})
         except Exception as e:
             obs = f"dispatch error (recovered): {e}"
-        messages.append({"role": "user", "content": f"OBSERVATION:\n{obs[:MAX_TOOL_OUTPUT_CHARS]}\nContinue with next tool or FINAL: when verified."})
+        # Audit write pressure + immediate pass→FINAL (replaces pass-only every-5-steps nudge below).
+        extra = ""
+        if kind == "audit":
+            try:
+                _ok, _ = self_check(kind, instruction, workdir)
+            except Exception:
+                _ok = False
+            if _ok:
+                extra = " Self-check PASSES — reply FINAL: now."
+            elif step >= 5:
+                extra = " NOTE: /app/security_report.json still MISSING — issue write_file next, do not re-list/re-read."
+        messages.append({"role": "user", "content": f"OBSERVATION:\n{obs[:MAX_TOOL_OUTPUT_CHARS]}\n{extra}\nContinue with next tool or FINAL: when verified."})
         last = obs
-        # early exit if self-check passes and LLM seems done-ish? no, let LLM decide; but quick win:
-        if step >= 4 and step % 5 == 0:
-            ok, _msg = self_check(kind, instruction, workdir)
-            if ok:
-                # tell LLM it's verifiably done
-                messages.append({"role": "user", "content": "Self-check currently PASSES. If no further work needed, reply FINAL:."})
+        # (removed pass-only periodic nudge; handled per-step above with no extra LLM call)
     return last
 
 
@@ -1100,7 +1122,7 @@ def run_prompt(prompt: str) -> str:
     llm_out = ""
     if model and base_url and api_key:
         try:
-            max_iters = 10 if kind == "trivial" else 25
+            max_iters = 10 if kind == "trivial" else (12 if kind == "audit" else 25)
             llm_out = run_llm_loop(prompt, kind, workdir, deadline, model, base_url, api_key, max_iters)
             log_event("llm_done", out=str(llm_out)[:1000])
         except Exception as e:
